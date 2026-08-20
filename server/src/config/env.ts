@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-
 dotenv.config();
 
 interface EnvConfig {
@@ -8,6 +7,12 @@ interface EnvConfig {
   clientUrl: string;
   databaseUrl: string;
   directUrl: string;
+  jwtAccessSecret: string;
+  jwtAccessExpiresIn: string;
+  jwtRefreshSecret: string;
+  jwtRefreshExpiresIn: string;
+  bcryptSaltRounds: number;
+  cookieDomain: string;
 }
 
 /**
@@ -31,6 +36,12 @@ export const env: EnvConfig = {
   clientUrl: process.env.CLIENT_URL ?? "http://localhost:5173",
   databaseUrl: requireEnv("DATABASE_URL"),
   directUrl: requireEnv("DIRECT_URL"),
+  jwtAccessSecret: requireEnv("JWT_ACCESS_SECRET"),
+  jwtAccessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN ?? "15m",
+  jwtRefreshSecret: requireEnv("JWT_REFRESH_SECRET"),
+  jwtRefreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? "7d",
+  bcryptSaltRounds: Number(process.env.BCRYPT_SALT_ROUNDS ?? 10),
+  cookieDomain: process.env.COOKIE_DOMAIN ?? "localhost",
 };
 
 export const isProduction = env.nodeEnv === "production";

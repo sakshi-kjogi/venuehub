@@ -2,10 +2,12 @@ import express, { Application } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 import { env, isDevelopment } from "@/config/env";
 import { errorHandler } from "@/shared/middleware/errorHandler";
 import { notFoundHandler } from "@/shared/middleware/notFoundHandler";
 import healthRoutes from "@/modules.health/health.routes";
+import authRoutes from "@/modules/auth/auth.routes";
 
 export function createApp(): Application {
   const app = express();
@@ -15,11 +17,12 @@ export function createApp(): Application {
   app.use(
     cors({
       origin: env.clientUrl,
-      credentials: true, // required later for refresh-token cookies (Day 4)
+      credentials: true, // required for refresh-token cookies (Day 4)
     })
   );
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use(cookieParser());
 
   // ---- Logging ----
   if (isDevelopment) {
@@ -28,9 +31,8 @@ export function createApp(): Application {
 
   // ---- Routes ----
   app.use("/api/health", healthRoutes);
-
+  app.use("/api/auth", authRoutes);
   // Future modules register here, e.g.:
-  // app.use("/api/auth", authRoutes);        <- Day 4
   // app.use("/api/venues", venueRoutes);      <- Day 6
 
   // ---- 404 + error handling (must be LAST) ----

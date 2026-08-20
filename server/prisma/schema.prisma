@@ -8,9 +8,23 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model HealthCheck {
-  id        String   @id @default(uuid())
-  checkedAt DateTime @default(now())
+enum Role {
+  CUSTOMER
+  VENUE_OWNER
+  VENDOR
+  ADMIN
+}
 
-  @@map("health_checks")
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  password     String
+  firstName    String
+  lastName     String
+  role         Role     @default(CUSTOMER)
+  refreshToken String?  // bcrypt hash of the current refresh token, null when logged out
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
 }
