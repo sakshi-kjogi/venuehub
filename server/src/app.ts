@@ -8,12 +8,12 @@ import { errorHandler } from "@/shared/middleware/errorHandler";
 import { notFoundHandler } from "@/shared/middleware/notFoundHandler";
 import healthRoutes from "@/modules.health/health.routes";
 import authRoutes from "@/modules/auth/auth.routes";
-import usersRoutes from "@/modules/users/users.routes"; // <-- NEW
+import usersRoutes from "@/modules/users/users.routes";
+import venuesRoutes from "@/modules/venues/venues.routes"; // <-- NEW
 
 export function createApp(): Application {
   const app = express();
 
-  // ---- Security & parsing middleware ----
   app.use(helmet());
   app.use(
     cors({
@@ -25,19 +25,17 @@ export function createApp(): Application {
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
 
-  // ---- Logging ----
   if (isDevelopment) {
     app.use(morgan("dev"));
   }
 
-  // ---- Routes ----
   app.use("/api/health", healthRoutes);
   app.use("/api/auth", authRoutes);
-  app.use("/api/users", usersRoutes); // <-- NEW
+  app.use("/api/users", usersRoutes);
+  app.use("/api/venues", venuesRoutes); // <-- NEW
   // Future modules register here, e.g.:
-  // app.use("/api/venues", venueRoutes);      <- Day 6
+  // app.use("/api/search", searchRoutes);     <- Day 7
 
-  // ---- 404 + error handling (must be LAST) ----
   app.use(notFoundHandler);
   app.use(errorHandler);
 

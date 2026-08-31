@@ -30,6 +30,26 @@ model User {
   refreshToken String?  // bcrypt hash of the current refresh token, null when logged out
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  venues       Venue[]
 
   @@map("users")
+}
+model Venue {
+  id          String   @id @default(cuid())
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id])
+  name        String
+  description String
+  address     String
+  city        String
+  country     String
+  capacity    Int
+  pricePerDay Decimal  @db.Decimal(10, 2)
+  amenities   String[]
+  images      String[]
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("venues")
 }

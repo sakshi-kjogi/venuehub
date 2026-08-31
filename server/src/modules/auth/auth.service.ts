@@ -39,6 +39,7 @@ export async function register(input: RegisterInput): Promise<AuthResult> {
       password: hashedPassword,
       firstName: input.firstName,
       lastName: input.lastName,
+      role: input.role, // validated against ['CUSTOMER','VENUE_OWNER','VENDOR'] — ADMIN is never accepted here
     },
   });
 
@@ -76,8 +77,6 @@ export async function refresh(incomingToken: string): Promise<AuthResult> {
 
   const matches = await compareValue(incomingToken, user.refreshToken);
   if (!matches) {
-    // Token presented doesn't match the last-issued hash — likely reuse of a
-    // rotated-out token. Revoke the session entirely as a precaution.
     await prisma.user.update({ where: { id: user.id }, data: { refreshToken: null } });
     throw new AppError('Session invalid — please log in again', 401);
   }

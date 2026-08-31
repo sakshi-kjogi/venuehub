@@ -7,6 +7,8 @@ export function Navbar() {
   const logoutMutation = useLogoutMutation();
   const navigate = useNavigate();
 
+  const canManageVenues = user && (user.role === "VENUE_OWNER" || user.role === "ADMIN");
+
   return (
     <header className="border-b border-gray-200 bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
@@ -17,8 +19,16 @@ export function Navbar() {
           <Link to="/" className="hover:text-gray-900">
             Home
           </Link>
+          <Link to="/venues" className="hover:text-gray-900">
+            Venues
+          </Link>
           {user ? (
             <>
+              {canManageVenues && (
+                <Link to="/my-venues" className="hover:text-gray-900">
+                  My Venues
+                </Link>
+              )}
               <Link to="/dashboard" className="hover:text-gray-900">
                 Dashboard
               </Link>
