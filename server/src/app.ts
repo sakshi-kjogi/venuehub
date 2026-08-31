@@ -8,6 +8,7 @@ import { errorHandler } from "@/shared/middleware/errorHandler";
 import { notFoundHandler } from "@/shared/middleware/notFoundHandler";
 import healthRoutes from "@/modules.health/health.routes";
 import authRoutes from "@/modules/auth/auth.routes";
+import usersRoutes from "@/modules/users/users.routes"; // <-- NEW
 
 export function createApp(): Application {
   const app = express();
@@ -17,7 +18,7 @@ export function createApp(): Application {
   app.use(
     cors({
       origin: env.clientUrl,
-      credentials: true, // required for refresh-token cookies (Day 4)
+      credentials: true,
     })
   );
   app.use(express.json());
@@ -32,6 +33,7 @@ export function createApp(): Application {
   // ---- Routes ----
   app.use("/api/health", healthRoutes);
   app.use("/api/auth", authRoutes);
+  app.use("/api/users", usersRoutes); // <-- NEW
   // Future modules register here, e.g.:
   // app.use("/api/venues", venueRoutes);      <- Day 6
 

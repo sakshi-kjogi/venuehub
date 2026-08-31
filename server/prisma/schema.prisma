@@ -21,6 +21,11 @@ model User {
   password     String
   firstName    String
   lastName     String
+  phone        String?
+  bio          String?
+  avatarUrl    String?
+  city         String?
+  country      String?
   role         Role     @default(CUSTOMER)
   refreshToken String?  // bcrypt hash of the current refresh token, null when logged out
   createdAt    DateTime @default(now())

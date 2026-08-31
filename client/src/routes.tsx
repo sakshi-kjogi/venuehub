@@ -5,6 +5,7 @@ import { NotFound } from "@/pages/NotFound";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Dashboard from "@/pages/Dashboard";
+import Profile from "@/pages/Profile";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export const routes: RouteObject[] = [
@@ -17,7 +18,10 @@ export const routes: RouteObject[] = [
       { path: "register", element: <Register /> },
       {
         element: <ProtectedRoute />,
-        children: [{ path: "dashboard", element: <Dashboard /> }],
+        children: [
+          { path: "dashboard", element: <Dashboard /> },
+          { path: "profile", element: <Profile /> },
+        ],
       },
       { path: "*", element: <NotFound /> },
     ],
