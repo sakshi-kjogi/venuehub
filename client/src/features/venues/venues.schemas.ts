@@ -8,7 +8,7 @@ export const venueFormSchema = z.object({
   country: z.string().min(1, 'Country is required'),
   capacity: z.coerce.number().int().positive('Capacity must be a positive number'),
   pricePerDay: z.coerce.number().positive('Price must be a positive number'),
-  amenitiesText: z.string(), // comma-separated in the UI, split before sending
+  amenities: z.array(z.string()),
 });
 
 export type VenueFormValues = z.infer<typeof venueFormSchema>;

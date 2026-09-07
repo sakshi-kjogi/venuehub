@@ -1,10 +1,12 @@
 import type { Request, Response, NextFunction } from 'express';
 import * as venuesService from './venues.service';
+import type { VenueQueryInput } from './venues.validation';
 
-export async function listVenuesHandler(_req: Request, res: Response, next: NextFunction) {
+export async function listVenuesHandler(req: Request, res: Response, next: NextFunction) {
   try {
-    const venues = await venuesService.listVenues();
-    res.status(200).json({ venues });
+    const query = req.query as unknown as VenueQueryInput;
+    const result = await venuesService.listVenues(query);
+    res.status(200).json(result);
   } catch (err) {
     next(err);
   }

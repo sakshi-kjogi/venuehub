@@ -1,12 +1,17 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import {
   fetchVenues, fetchMyVenues, fetchVenueById,
   createVenueRequest, updateVenueRequest, deleteVenueRequest,
-} from './venues.api';
+} from './api/venues.api';
 import type { VenueFormValues } from './venues.schemas';
+import type { VenueFilters } from './types/venue.types';
 
-export function useVenuesQuery() {
-  return useQuery({ queryKey: ['venues'], queryFn: fetchVenues });
+export function useVenuesQuery(filters: VenueFilters) {
+  return useQuery({
+    queryKey: ['venues', filters],
+    queryFn: () => fetchVenues(filters),
+    placeholderData: keepPreviousData,
+  });
 }
 
 export function useMyVenuesQuery() {

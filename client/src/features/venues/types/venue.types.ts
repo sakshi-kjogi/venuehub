@@ -41,3 +41,11 @@ export interface PaginatedVenues {
   data: Venue[];
   pagination: VenuePagination;
 }
+
+// Canonical amenity vocabulary — shared by VenueForm (creation/edit) and
+// VenueFiltersForm (search) so a value picked when listing a venue is
+// guaranteed to match a value selectable in the filter. This list must
+// live in exactly one place; both forms import it from here.
+export const AMENITY_OPTIONS = [
+  'Parking', 'WiFi', 'AC', 'Catering', 'Sound System', 'Stage', 'Generator', 'Decor',
+] as const;

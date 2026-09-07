@@ -34,6 +34,7 @@ model User {
 
   @@map("users")
 }
+
 model Venue {
   id          String   @id @default(cuid())
   ownerId     String
@@ -51,5 +52,8 @@ model Venue {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@index([city])
+  @@index([pricePerDay])
+  @@index([isPublished])
   @@map("venues")
 }

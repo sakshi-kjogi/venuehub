@@ -1,8 +1,18 @@
 import { prisma } from '@/shared/database/prisma';
 import { AppError } from '@/shared/middleware/errorHandler';
-import type { CreateVenueInput, UpdateVenueInput } from './venues.validation';
+import type { CreateVenueInput, UpdateVenueInput, VenueQueryInput } from './venues.validation';
 import type { VenuePublic } from './venues.types';
-import type { Role } from '@prisma/client';
+import type { Prisma, Role } from '@prisma/client';
+
+export interface PaginatedVenues {
+  data: VenuePublic[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
 
 function toPublic(venue: {
   id: string; ownerId: string; name: string; description: string; address: string;
@@ -32,12 +42,51 @@ function assertOwnerOrAdmin(venueOwnerId: string, userId: string, role: Role) {
   }
 }
 
-export async function listVenues(): Promise<VenuePublic[]> {
-  const venues = await prisma.venue.findMany({
-    where: { isPublished: true },
-    orderBy: { createdAt: 'desc' },
-  });
-  return venues.map(toPublic);
+export async function listVenues(query: VenueQueryInput): Promise<PaginatedVenues> {
+  const { search, city, minPrice, maxPrice, minCapacity, amenities, sortBy, sortOrder, page, limit } = query;
+
+  // isPublished: true is a fixed, unconditional constraint — never merged
+  // with or overridable by any of the dynamic filters below.
+  const where: Prisma.VenueWhereInput = {
+    isPublished: true,
+    city: city ? { equals: city, mode: 'insensitive' } : undefined,
+    pricePerDay:
+      minPrice !== undefined || maxPrice !== undefined
+        ? { gte: minPrice, lte: maxPrice }
+        : undefined,
+    capacity: minCapacity !== undefined ? { gte: minCapacity } : undefined,
+    // hasEvery, not hasSome: selecting "Parking" + "AC" means venues with
+    // BOTH, not either — filters narrow results, they don't broaden them.
+    amenities: amenities && amenities.length > 0 ? { hasEvery: amenities } : undefined,
+    OR: search
+      ? [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+        ]
+      : undefined,
+  };
+
+  const skip = (page - 1) * limit;
+
+  const [venues, total] = await Promise.all([
+    prisma.venue.findMany({
+      where,
+      orderBy: { [sortBy]: sortOrder },
+      skip,
+      take: limit,
+    }),
+    prisma.venue.count({ where }),
+  ]);
+
+  return {
+    data: venues.map(toPublic),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 }
 
 export async function listMyVenues(userId: string): Promise<VenuePublic[]> {

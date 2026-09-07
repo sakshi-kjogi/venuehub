@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { authenticate } from '@/shared/middleware/authenticate';
 import { authorize } from '@/shared/middleware/authorize';
 import { validate } from '@/shared/middleware/validate';
-import { createVenueSchema, updateVenueSchema } from './venues.validation';
+import { createVenueSchema, updateVenueSchema, venueQuerySchema } from './venues.validation';
 import {
   listVenuesHandler,
   listMyVenuesHandler,
@@ -15,7 +15,7 @@ import {
 const router = Router();
 
 // Public reads
-router.get('/', listVenuesHandler);
+router.get('/', validate(venueQuerySchema, 'query'), listVenuesHandler);
 
 // IMPORTANT: /mine must be registered BEFORE /:id, or Express will treat
 // "mine" as a venue ID and route it to getVenueHandler instead.

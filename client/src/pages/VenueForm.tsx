@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useParams, useNavigate } from 'react-router-dom';
 import { venueFormSchema, type VenueFormValues } from '@/features/venues/venues.schemas';
+import { AMENITY_OPTIONS } from '@/features/venues/types/venue.types';
 import {
   useVenueQuery, useCreateVenueMutation, useUpdateVenueMutation,
 } from '@/features/venues/useVenueQueries';
@@ -11,14 +12,18 @@ export default function VenueForm() {
   const { id } = useParams<{ id?: string }>();
   const isEditMode = !!id;
   const navigate = useNavigate();
-
   const { data: existingVenue } = useVenueQuery(id ?? '');
   const createMutation = useCreateVenueMutation();
   const updateMutation = useUpdateVenueMutation(id ?? '');
-
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<VenueFormValues>({
+  const {
+    register, handleSubmit, reset, watch, setValue,
+    formState: { errors },
+  } = useForm<VenueFormValues>({
     resolver: zodResolver(venueFormSchema),
+    defaultValues: { amenities: [] },
   });
+
+  const selectedAmenities = watch('amenities');
 
   useEffect(() => {
     if (isEditMode && existingVenue) {
@@ -30,10 +35,21 @@ export default function VenueForm() {
         country: existingVenue.country,
         capacity: existingVenue.capacity,
         pricePerDay: existingVenue.pricePerDay,
-        amenitiesText: existingVenue.amenities.join(', '),
+        // Venues created before this fix may have free-text amenities that
+        // don't match any option below — those show as unchecked here, and
+        // saving this form replaces them with whatever's checked. This is
+        // expected: it's how old data migrates to the canonical vocabulary.
+        amenities: existingVenue.amenities,
       });
     }
   }, [isEditMode, existingVenue, reset]);
+
+  function toggleAmenity(amenity: string) {
+    const next = selectedAmenities.includes(amenity)
+      ? selectedAmenities.filter((a) => a !== amenity)
+      : [...selectedAmenities, amenity];
+    setValue('amenities', next, { shouldValidate: true });
+  }
 
   const onSubmit = (values: VenueFormValues) => {
     if (isEditMode) {
@@ -89,8 +105,19 @@ export default function VenueForm() {
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium">Amenities (comma-separated)</label>
-          <input {...register('amenitiesText')} placeholder="Parking, WiFi, Catering" className="mt-1 w-full rounded border px-3 py-2" />
+          <label className="block text-sm font-medium">Amenities</label>
+          <div className="mt-2 flex flex-wrap gap-3">
+            {AMENITY_OPTIONS.map((amenity) => (
+              <label key={amenity} className="flex items-center gap-1.5 text-sm">
+                <input
+                  type="checkbox"
+                  checked={selectedAmenities.includes(amenity)}
+                  onChange={() => toggleAmenity(amenity)}
+                />
+                {amenity}
+              </label>
+            ))}
+          </div>
         </div>
         <button
           type="submit"
