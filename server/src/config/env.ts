@@ -13,6 +13,9 @@ interface EnvConfig {
   jwtRefreshExpiresIn: string;
   bcryptSaltRounds: number;
   cookieDomain: string;
+  cloudinaryCloudName: string;
+  cloudinaryApiKey: string;
+  cloudinaryApiSecret: string;
 }
 
 /**
@@ -42,6 +45,9 @@ export const env: EnvConfig = {
   jwtRefreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? "7d",
   bcryptSaltRounds: Number(process.env.BCRYPT_SALT_ROUNDS ?? 10),
   cookieDomain: process.env.COOKIE_DOMAIN ?? "localhost",
+  cloudinaryCloudName: requireEnv("CLOUDINARY_CLOUD_NAME"),
+  cloudinaryApiKey: requireEnv("CLOUDINARY_API_KEY"),
+  cloudinaryApiSecret: requireEnv("CLOUDINARY_API_SECRET"),
 };
 
 export const isProduction = env.nodeEnv === "production";

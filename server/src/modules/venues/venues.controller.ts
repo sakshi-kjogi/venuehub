@@ -59,3 +59,39 @@ export async function deleteVenueHandler(req: Request, res: Response, next: Next
     next(err);
   }
 }
+
+export async function addVenueImageHandler(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = req.params.id as string;
+    if (!req.file) {
+      res.status(400).json({ success: false, message: 'No image file provided' });
+      return;
+    }
+    const venue = await venuesService.addVenueImage(id, req.user!.userId, req.user!.role, req.file.buffer);
+    res.status(201).json({ venue });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteVenueImageHandler(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = req.params.id as string;
+    const imageId = req.params.imageId as string;
+    const venue = await venuesService.deleteVenueImage(id, imageId, req.user!.userId, req.user!.role);
+    res.status(200).json({ venue });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function setCoverImageHandler(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = req.params.id as string;
+    const imageId = req.params.imageId as string;
+    const venue = await venuesService.setCoverImage(id, imageId, req.user!.userId, req.user!.role);
+    res.status(200).json({ venue });
+  } catch (err) {
+    next(err);
+  }
+}

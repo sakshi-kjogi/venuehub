@@ -20,18 +20,30 @@ export default function Venues() {
       {result && (
         <div className={isPlaceholderData ? 'opacity-60 transition-opacity' : ''}>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {result.data.map((venue) => (
-              <Link
-                key={venue.id}
-                to={`/venues/${venue.id}`}
-                className="block rounded-lg border border-gray-200 p-4 hover:shadow-md"
-              >
-                <h2 className="text-lg font-semibold">{venue.name}</h2>
-                <p className="text-sm text-gray-500">{venue.city}, {venue.country}</p>
-                <p className="mt-2 text-sm text-gray-700">Capacity: {venue.capacity}</p>
-                <p className="mt-1 font-medium text-blue-600">₹{venue.pricePerDay.toLocaleString()} / day</p>
-              </Link>
-            ))}
+            {result.data.map((venue) => {
+              const cover = venue.images.find((img) => img.isCover) ?? venue.images[0];
+              return (
+                <Link
+                  key={venue.id}
+                  to={`/venues/${venue.id}`}
+                  className="block overflow-hidden rounded-lg border border-gray-200 hover:shadow-md"
+                >
+                  {cover ? (
+                    <img src={cover.url} alt={venue.name} className="h-40 w-full object-cover" />
+                  ) : (
+                    <div className="flex h-40 w-full items-center justify-center bg-gray-100 text-sm text-gray-400">
+                      No photo yet
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <h2 className="text-lg font-semibold">{venue.name}</h2>
+                    <p className="text-sm text-gray-500">{venue.city}, {venue.country}</p>
+                    <p className="mt-2 text-sm text-gray-700">Capacity: {venue.capacity}</p>
+                    <p className="mt-1 font-medium text-blue-600">₹{venue.pricePerDay.toLocaleString()} / day</p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
 
           {result.data.length === 0 && (
